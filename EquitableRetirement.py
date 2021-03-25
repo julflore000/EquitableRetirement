@@ -151,7 +151,7 @@ class EquitableRetirement:
 
         def capInvestLimit(model,r,c,y): ## MAYBE DELETE
             return model.capInvest[r,c,y] <= model.MAXCAP[r]*model.reInvest[r,c,y]
-        #model.capInvestLimit = pe.Constraint(model.R,model.C,model.Y,rule=capInvestLimit)
+        model.capInvestLimit = pe.Constraint(model.R,model.C,model.Y,rule=capInvestLimit)
 
         def reInvestRule(model,r,c,y):
             if y == model.Y[1]:
