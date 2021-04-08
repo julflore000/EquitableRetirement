@@ -143,7 +143,7 @@ class EquitableRetirement:
         model.reCapLimit = pe.Constraint(model.R,model.Y,rule=reCapLimit)
 
         def capInvestRule(model,r,c,y):
-            if y == model.Y[1]:
+            if y == model.Y[0]:
                 return model.capInvest[r,c,y] == model.reCap[r,c,y]
             #else
             return model.capInvest[r,c,y] == model.reCap[r,c,y] - model.reCap[r,c,y-1]
@@ -154,7 +154,7 @@ class EquitableRetirement:
         model.capInvestLimit = pe.Constraint(model.R,model.C,model.Y,rule=capInvestLimit)
 
         def reInvestRule(model,r,c,y):
-            if y == model.Y[1]:
+            if y == model.Y[0]:
                 return model.reInvest[r,c,y] == model.reOnline[r,c,y]
             #else
             return model.reInvest[r,c,y] == model.reOnline[r,c,y] - model.reOnline[r,c,y-1]
@@ -165,7 +165,7 @@ class EquitableRetirement:
         model.reInvestLimit = pe.Constraint(model.C,model.Y,rule=reInvestLimit)
 
         def coalRetireRule(model,c,y):
-            if y == model.Y[1]:
+            if y == model.Y[0]:
                 return model.coalRetire[c,y] == 1 - model.coalOnline[c,y]
             #else
             return model.coalRetire[c,y] == model.coalOnline[c,y-1] - model.coalOnline[c,y]
@@ -202,7 +202,6 @@ class EquitableRetirement:
         self.Output.reOnline = np.array([[[pe.value(self.model.reOnline[r,c,y]) for y in self.Y] for c in self.C] for r in self.R])
         self.Output.coalOnline = np.array([[pe.value(self.model.coalOnline[c,y]) for y in self.Y] for c in self.C])
         pass
-
 
 def test():
     ##### SAMPLE DATA #####
