@@ -76,34 +76,34 @@ class EquitableRetirement:
         model = pe.ConcreteModel()
 
         # sets 
-        model.Y = pe.Set(initialize=self.Y) 
-        model.C = pe.Set(initialize=self.C)
-        model.R = pe.Set(initialize=self.R)
+        model.Y = pe.Set(initialize=self.Y, doc = "Years of program") 
+        model.C = pe.Set(initialize=self.C, doc = "Coal Plant IDs")
+        model.R = pe.Set(initialize=self.R, doc='Renewable plant locations with type of technology (wind or solar)')
 
         # parameters
-        model.HISTGEN = pe.Param(model.C, model.Y, initialize=a2d(self.Params.HISTGEN,self.C,self.Y))
-        model.CF = pe.Param(model.R, model.Y, initialize=a2d(self.Params.CF,self.R,self.Y))
-        model.CAPEX = pe.Param(model.R, initialize=a2d(self.Params.CAPEX,self.R))
-        model.REOPEX = pe.Param(model.R, initialize=a2d(self.Params.REOPEX,self.R))
-        model.COALOPEX = pe.Param(model.C, initialize=a2d(self.Params.COALOPEX,self.C))
-        model.MAXCAP = pe.Param(model.R,initialize=a2d(self.Params.MAXCAP,self.R))
-        model.MAXSITES = pe.Param(model.C,initialize=a2d(self.Params.MAXSITES,self.C))
-        model.HD = pe.Param(model.C,initialize=a2d(self.Params.HD,self.C))
-        model.RETEF = pe.Param(model.C,initialize=a2d(self.Params.RETEF,self.C))
-        model.CONEF = pe.Param(model.R,initialize=a2d(self.Params.CONEF,self.R))
-        model.COALOMEF = pe.Param(model.C,initialize=a2d(self.Params.COALOMEF,self.C))
-        model.REOMEF = pe.Param(model.R,initialize=a2d(self.Params.REOMEF,self.R))
+        model.HISTGEN = pe.Param(model.C, model.Y, initialize=a2d(self.Params.HISTGEN,self.C,self.Y), doc = "Historical Generation of coal plants")
+        model.CF = pe.Param(model.R, model.Y, initialize=a2d(self.Params.CF,self.R,self.Y),doc = "Hourly CF of each RE location")
+        model.CAPEX = pe.Param(model.R, initialize=a2d(self.Params.CAPEX,self.R),doc = "RE plants CAPEX values ($/MW")
+        model.REOPEX = pe.Param(model.R, initialize=a2d(self.Params.REOPEX,self.R),doc = "RE plants OPEX values ($/MWh")
+        model.COALOPEX = pe.Param(model.C, initialize=a2d(self.Params.COALOPEX,self.C), doc = "Coal plants OPEX values $/MWh")
+        model.MAXCAP = pe.Param(model.R,initialize=a2d(self.Params.MAXCAP,self.R), doc ='Maximum capacity for RE plant at the site')
+        model.MAXSITES = pe.Param(model.C,initialize=a2d(self.Params.MAXSITES,self.C), doc = "Number of Sites allowable to replace coal plant")
+        model.HD = pe.Param(model.C,initialize=a2d(self.Params.HD,self.C), doc="Health damages of each coal plant")
+        model.RETEF = pe.Param(model.C,initialize=a2d(self.Params.RETEF,self.C), doc="Retirement EF for each coal plant (will most likely be a single static value)")
+        model.CONEF = pe.Param(model.R,model.Y,initialize=a2d(self.Params.CONEF,self.R),doc="Construction/installation EF for RE plants")
+        model.COALOMEF = pe.Param(model.C,initialize=a2d(self.Params.COALOMEF,self.C),doc="O&M EF for coal plants (will be most likely be a static value as well)")
+        model.REOMEF = pe.Param(model.R,model.Y,initialize=a2d(self.Params.REOMEF,self.R),doc="O&M EF for RE plants")
 
         # variables
-        model.capInvest = pe.Var(model.R,model.C,model.Y,within=pe.NonNegativeReals)
-        model.capRetire = pe.Var(model.C,model.Y,within=pe.NonNegativeReals)
-        model.coalGen = pe.Var(model.C,model.Y,within=pe.NonNegativeReals)
-        model.reGen = pe.Var(model.R,model.C,model.Y,within=pe.NonNegativeReals)
-        model.reCap = pe.Var(model.R,model.C,model.Y,within=pe.NonNegativeReals)
-        model.reInvest = pe.Var(model.R,model.C,model.Y,within=pe.Binary)
-        model.coalRetire = pe.Var(model.C,model.Y,within=pe.Binary)
-        model.reOnline = pe.Var(model.R,model.C,model.Y,within=pe.Binary)
-        model.coalOnline = pe.Var(model.C,model.Y,within=pe.Binary)
+        model.capInvest = pe.Var(model.R,model.C,model.Y,within=pe.NonNegativeReals, doc = "Capacity to be invested in that renewable plant to replace coal")
+        model.capRetire = pe.Var(model.C,model.Y,within=pe.NonNegativeReals,doc = "amount of capacity to be retired for each coal plant")
+        model.coalGen = pe.Var(model.C,model.Y,within=pe.NonNegativeReals, doc = "Coal generation for each plant")
+        model.reGen = pe.Var(model.R,model.C,model.Y,within=pe.NonNegativeReals, doc = "RE generation for each plant")
+        model.reCap = pe.Var(model.R,model.C,model.Y,within=pe.NonNegativeReals, doc = "Capacity size for each RE plant")
+        model.reInvest = pe.Var(model.R,model.C,model.Y,within=pe.Binary, doc = "Binary variable to invest in RE to replace coal")
+        model.coalRetire = pe.Var(model.C,model.Y,within=pe.Binary, doc = "Binary variable to retire coal plant")
+        model.reOnline = pe.Var(model.R,model.C,model.Y,within=pe.Binary, doc = "Binary variable of whether the RE plant is on (1) or off (0)")
+        model.coalOnline = pe.Var(model.C,model.Y,within=pe.Binary, doc = "Binary variable of whether the coal plant is on (1) or off (0)")
 
         # objective 
         def SystemCosts(model):
@@ -115,65 +115,65 @@ class EquitableRetirement:
 
         def Jobs(model):
             return sum(sum(model.RETEF[c]*model.capRetire[c,y] + model.COALOMEF[c]*model.coalGen[c,y] for c in model.C) for y in model.Y) \
-                + sum(sum(sum(model.CONEF[r]*model.capInvest[r,c,y] + model.REOMEF[r]*model.reGen[r,c,y] for c in model.C) for r in model.R) for y in model.Y)
+                + sum(sum(sum(model.CONEF[r,y]*model.capInvest[r,c,y] + model.REOMEF[r,y]*model.reGen[r,c,y] for c in model.C) for r in model.R) for y in model.Y)
 
         def Z(model):
             return alpha*SystemCosts(model) + beta*HealthCosts(model) - gamma*Jobs(model)
-        model.Z = pe.Objective(rule=Z)
+        model.Z = pe.Objective(rule=Z, doc='Minimize system costs, health damages, while maximizing jobs')
 
         # constraints
         def coalGenRule(model,c,y):
             return model.coalGen[c,y] == model.HISTGEN[c,y]*model.coalOnline[c,y]
-        model.coalGenRule = pe.Constraint(model.C,model.Y,rule=coalGenRule)
+        model.coalGenRule = pe.Constraint(model.C,model.Y,rule=coalGenRule, doc='Coal generation must equal historical generation * whether that plant is online')
 
         def balanceGenRule(model,c,y):
             return sum(model.reGen[r,c,y] for r in model.R) == model.HISTGEN[c,y]-model.coalGen[c,y]
-        model.balanceGenRule = pe.Constraint(model.C,model.Y,rule=balanceGenRule)
+        model.balanceGenRule = pe.Constraint(model.C,model.Y,rule=balanceGenRule, doc = "RE generation for each coal location must equal retired capacity")
 
         def reGenRule(model,r,c,y):
             return model.reGen[r,c,y] <= model.CF[r,y]*model.reCap[r,c,y]
-        model.reGenRule = pe.Constraint(model.R,model.C,model.Y,rule=reGenRule)
+        model.reGenRule = pe.Constraint(model.R,model.C,model.Y,rule=reGenRule, doc='RE generation must be less than or equal to capacity factor* chosen capacity')
 
         def reCapRule(model,r,c,y):
             return model.reCap[r,c,y] <= model.MAXCAP[r]*model.reOnline[r,c,y]
-        model.reCapRule = pe.Constraint(model.R,model.C,model.Y,rule=reCapRule)
+        model.reCapRule = pe.Constraint(model.R,model.C,model.Y,rule=reCapRule, doc = "RE capacity decision variable should be less then or equal to max capacity* whether RE plant is online")
 
         def reCapLimit(model,r,y):
             return sum(model.reCap[r,c,y] for c in model.C) <= model.MAXCAP[r]
-        model.reCapLimit = pe.Constraint(model.R,model.Y,rule=reCapLimit)
+        model.reCapLimit = pe.Constraint(model.R,model.Y,rule=reCapLimit, doc = "RE plants can not overcount towards multiple coal generators (sum of RE plant contribution to each coal plant <= max cap of RE plant)")
 
         def capInvestRule(model,r,c,y):
             if y == model.Y[0]:
                 return model.capInvest[r,c,y] == model.reCap[r,c,y]
             #else
             return model.capInvest[r,c,y] == model.reCap[r,c,y] - model.reCap[r,c,y-1]
-        model.capInvestRule = pe.Constraint(model.R,model.C,model.Y,rule=capInvestRule)
+        model.capInvestRule = pe.Constraint(model.R,model.C,model.Y,rule=capInvestRule, doc = "RE capacity to invest must be equal to difference in RE cap across years")
 
         def capInvestLimit(model,r,c,y): ## MAYBE DELETE
             return model.capInvest[r,c,y] <= model.MAXCAP[r]*model.reInvest[r,c,y]
-        model.capInvestLimit = pe.Constraint(model.R,model.C,model.Y,rule=capInvestLimit)
+        model.capInvestLimit = pe.Constraint(model.R,model.C,model.Y,rule=capInvestLimit, doc = "RE capacity to invest must be less than or equal to max cap * whether we invest or not")
 
         def reInvestRule(model,r,c,y):
             if y == model.Y[0]:
                 return model.reInvest[r,c,y] == model.reOnline[r,c,y]
             #else
             return model.reInvest[r,c,y] == model.reOnline[r,c,y] - model.reOnline[r,c,y-1]
-        model.reInvestRule = pe.Constraint(model.R,model.C,model.Y,rule=reInvestRule)
+        model.reInvestRule = pe.Constraint(model.R,model.C,model.Y,rule=reInvestRule,doc= "Decision to invest in RE is current year - prior")
 
         def reInvestLimit(model,c,y):
             return sum( model.reInvest[r,c,y] for r in model.R) <= model.MAXSITES[c] * model.coalRetire[c,y]
-        model.reInvestLimit = pe.Constraint(model.C,model.Y,rule=reInvestLimit)
+        model.reInvestLimit = pe.Constraint(model.C,model.Y,rule=reInvestLimit,doc = "Number of new RE sites must be less than or equal to max RE sites for that coal plant * whether we retire")
 
         def coalRetireRule(model,c,y):
             if y == model.Y[0]:
                 return model.coalRetire[c,y] == 1 - model.coalOnline[c,y]
             #else
             return model.coalRetire[c,y] == model.coalOnline[c,y-1] - model.coalOnline[c,y]
-        model.coalRetireRule = pe.Constraint(model.C,model.Y,rule=coalRetireRule)
+        model.coalRetireRule = pe.Constraint(model.C,model.Y,rule=coalRetireRule, doc = "Coal retire activation is current year must prior year")
 
         def coalRetireLimit(model,c):
             return sum(model.coalRetire[c,y] for y in model.Y) <= 1
-        model.coalRetireLimit = pe.Constraint(model.C,rule=coalRetireLimit)
+        model.coalRetireLimit = pe.Constraint(model.C,rule=coalRetireLimit, doc = "Can only retire a coal plant once over time period")
 
         self.model = model
 
