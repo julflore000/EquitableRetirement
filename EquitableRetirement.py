@@ -178,11 +178,8 @@ class EquitableRetirement:
         model.coalRetireLimit = pe.Constraint(model.C,rule=coalRetireLimit, doc = "Can only retire a coal plant once over time period")
 
         def coalCapRetire(model,c,y):
-            if y == model.Y[1]:
-                return model.capRetire[c,y] == model.HISTGEN[c,y] - model.coalGen[c,y]
-            #else
-            return model.capRetire[c,y]  == model.coalGen[c,y-1]-model.coalGen[c,y]
-        model.coalCapRetire = pe.Constraint(model.C,model.Y,rule=coalCapRetire, doc = "Coal capacity retired is equal to change in re generation at that coal plant")
+            return model.capRetire[c,y]  == model.HISTGEN[c,y]*model.coalRetire[c,y]
+        model.coalCapRetire = pe.Constraint(model.C,model.Y,rule=coalCapRetire, doc = "Coal capacity retired is equal to historical gen * whether we retire that year")
 
         self.model = model
 
