@@ -179,9 +179,9 @@ class EquitableRetirement:
 
         def coalCapRetire(model,c,y):
             if y == model.Y[1]:
-                return model.capRetire[c,y] == sum(model.reGen[r,c,y] for r in model.R)
+                return model.capRetire[c,y] == model.HISTGEN[c,y] - model.coalGen[c,y]
             #else
-            return model.capRetire[c,y]  == sum(model.reGen[r,c,y-1]-model.reGen[r,c,y] for r in model.R)
+            return model.capRetire[c,y]  == model.coalGen[c,y-1]-model.coalGen[c,y]
         model.coalCapRetire = pe.Constraint(model.C,model.Y,rule=coalCapRetire, doc = "Coal capacity retired is equal to change in re generation at that coal plant")
 
         self.model = model
