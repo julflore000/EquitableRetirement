@@ -182,10 +182,7 @@ class EquitableRetirement:
         model.coalRetireLimit = pe.Constraint(model.C,rule=coalRetireLimit, doc = "Can only retire a coal plant once over time period")
 
         def coalCapRetire(model,c,y):
-            if y == model.Y[1]:
-                return model.capRetire[c,y] == sum(model.reGen[r,c,y] for r in model.R)
-            #else
-            return model.capRetire[c,y]  == sum(model.reGen[r,c,y-1]-model.reGen[r,c,y] for r in model.R)
+            return model.capRetire[c,y]  == model.HISTGEN[c,y]*model.coalRetire[c,y]
         model.coalCapRetire = pe.Constraint(model.C,model.Y,rule=coalCapRetire, doc = "Coal capacity retired is equal to change in re generation at that coal plant")
 
         self.model = model
@@ -210,15 +207,15 @@ class EquitableRetirement:
 
     def __extractResults(self):
         self.Output.Z = round(pe.value(self.model.Z),2)
-        self.Output.capInvest = np.array([[[pe.value(self.model.capInvest[r,c,y]) for y in self.Y] for c in self.C] for r in self.R])
-        self.Output.capRetire = np.array([[pe.value(self.model.capRetire[c,y]) for y in self.Y] for c in self.C])
-        self.Output.reGen = np.array([[[pe.value(self.model.reGen[r,c,y]) for y in self.Y] for c in self.C] for r in self.R])
-        self.Output.coalGen = np.array([[pe.value(self.model.coalGen[c,y]) for y in self.Y] for c in self.C])
-        self.Output.reCap = np.array([[[pe.value(self.model.reCap[r,c,y]) for y in self.Y] for c in self.C] for r in self.R])
-        self.Output.reInvest = np.array([[[pe.value(self.model.reInvest[r,c,y]) for y in self.Y] for c in self.C] for r in self.R])
-        self.Output.coalRetire = np.array([[pe.value(self.model.coalRetire[c,y]) for y in self.Y] for c in self.C])
-        self.Output.reOnline = np.array([[[pe.value(self.model.reOnline[r,c,y]) for y in self.Y] for c in self.C] for r in self.R])
-        self.Output.coalOnline = np.array([[pe.value(self.model.coalOnline[c,y]) for y in self.Y] for c in self.C])
+        self.Output.capInvest = np.array([[[round(pe.value(self.model.capInvest[r,c,y]),2) for y in self.Y] for c in self.C] for r in self.R])
+        self.Output.capRetire = np.array([[round(pe.value(self.model.capRetire[c,y]),2) for y in self.Y] for c in self.C])
+        self.Output.reGen = np.array([[[round(pe.value(self.model.reGen[r,c,y]),2) for y in self.Y] for c in self.C] for r in self.R])
+        self.Output.coalGen = np.array([[round(pe.value(self.model.coalGen[c,y]),2) for y in self.Y] for c in self.C])
+        self.Output.reCap = np.array([[[round(pe.value(self.model.reCap[r,c,y]),2) for y in self.Y] for c in self.C] for r in self.R])
+        self.Output.reInvest = np.array([[[round(pe.value(self.model.reInvest[r,c,y]),2) for y in self.Y] for c in self.C] for r in self.R])
+        self.Output.coalRetire = np.array([[round(pe.value(self.model.coalRetire[c,y]),2) for y in self.Y] for c in self.C])
+        self.Output.reOnline = np.array([[[round(pe.value(self.model.reOnline[r,c,y]),2) for y in self.Y] for c in self.C] for r in self.R])
+        self.Output.coalOnline = np.array([[round(pe.value(self.model.coalOnline[c,y]),2) for y in self.Y] for c in self.C])
         pass
     def saveResults(self,alpha,beta,gamma):
 
@@ -287,34 +284,33 @@ def test():
 def runTests():
     years =  [2020,2021,2022]
     coalPlants = ["C1","C2"]
-    rePlants = ["R1","R2"]
+    rePlants = ["R1"]
     ##### SAMPLE DATA Run #####
     numYears = len(years)
     numCoal = len(coalPlants)
     numRE = len(rePlants)
     
     #weights
-    alpha = 0 #system costs weight
-    beta = 0 #health weight
-    gamma = 1 #jobs weight
+    alpha = 0.5 #system costs weight
+    beta = 1 #health weight
+    gamma = 0.5 #jobs weight
     
     R = rePlants
     C = coalPlants
     Y = years
     
     HISTGEN = [[10,10,10],[10,10,10]] #Two 10 MW coal plants from 2020-2022
-    MAXCAP = [20,20] #Two 20 MW RE plants
-    CF = [[.25,.25,.25],[.5,.5,.5]] #25% CF for R1 and 50% CF for R2
-    CAPEX = [1,2] #R1 cheaper than R2
-    REOPEX = [1,2] #R1 cheaper than R2
+    MAXCAP = [20] #One 20 MW RE plant
+    CF = [[.4,.75,.75]]#Rising CF for R1
+    CAPEX = [1] #R1 CAPEX costs
+    REOPEX = [1] #R1 OPEX costs
     COALOPEX = [5,6] #Coal 1 cheaper than coal 2 (however both are more expensive then R1 and R2)
     MAXSITES = [1,2] #1 RE plant available for coal plant 1 and 2 RE plants for coal plant 2
     HD = [10,5] #C1 10 $/MWh while C2 5$/MWh (C1 worse health option then C2)
-    RETEF = [1,1] #Constant retirement EFs (COAL 1 RET EFS =COAL 2 RET EFS)
-    CONEF = [[1,1,1],[2,2,2]] #R1 lower construction EF then R2
-    COALOMEF = [.25,.25] #Coal plant 1 and coal plant 2 have same O&M ratios
-    REOMEF = [[.25,.25,.25],[.5,.5,.5]] #R1 lower O&M EF then R2
-    
+    RETEF = [0,0] #Constant retirement EFs (COAL 1 RET EFS =COAL 2 RET EFS)
+    CONEF = [[.1,1,.1]] #R1 construction EF
+    COALOMEF = [.5,.5] #Coal plant 1 and coal plant 2 have same O&M ratios
+    REOMEF = [[0,0,0]] #R1 O&M EFs 
     ######################
 
     m = EquitableRetirement()
