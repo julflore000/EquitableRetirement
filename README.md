@@ -15,28 +15,28 @@ Python implementation of the "TITLE" (multi-objective pathways to *more* equitab
         pip install numpy
         pip install pandas
         conda install glpk --channel conda-forge
-
+ 
 # List of tests
 1. **Single weight tests**
-    * Test only system cost weight: Run 1,2 
-    * Test only health weight: Run 3,4
-    * Test only jobs weight: Run 5
+    * Test only system cost weight: Run 1,2 **(done)**
+    * Test only health weight: Run 3,4 **(done)**
+    * Test only jobs weight: Run 5 **(done)**
 4. Other detail tests w/ 1 weight:
-    * Test max sites implementation: Run 2,4 
-    * Test multiple RE & coal plant operations: Run 1-5
+    * Test max sites implementation: Run 2,4 **(done)** 
+    * Test multiple RE & coal plant operations: Run 1-5 **(done)**
 6. **Test investment after 1 year (staggered retirement):** Run 6-9
-    * Depends on system costs-changing CF:  Run 6
+    * Depends on system costs-changing CF:  Run 6 **(done)**
     * Depends on health damages: HD don't change overtime (did not test)
     * Depends on EF factors:
-        * Only RE construction EF: Run 7
-        * Only RE operation EF: Run 8
-        * Combination of all three EFs: Run 9
+        * Only RE construction EF: Run 7  **(done)**
+        * Only RE operation EF: Run 8 **(done)**
+        * Combination of all three EFs: Run 9 **(done)**
 11. **Two weight tests:**
-    * System costs + health weight: Run 10
-    * Systems costs + jobs weight: Run 11
-    * Health + jobs weight:Run 12
+    * System costs + health weight: Run 10 **(done)**
+    * Systems costs + jobs weight: Run 11 **(done)**
+    * Health + jobs weight:Run 12 **(done)**
 12. **Three weight test:**
-    * System cost + health + jobs weight: Run 13
+    * System cost + health + jobs weight: Run 13 **(done)**
 
 
 # Test Run (1-5) Dataset
