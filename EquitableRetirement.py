@@ -291,9 +291,9 @@ def runTests():
     numRE = len(rePlants)
     
     #weights
-    alpha = 0.5 #system costs weight
-    beta = 1 #health weight
-    gamma = 0.5 #jobs weight
+    alpha = 0 #system costs weight
+    beta = 0 #health weight
+    gamma = 1 #jobs weight
     
     R = rePlants
     C = coalPlants
@@ -301,16 +301,16 @@ def runTests():
     
     HISTGEN = [[10,10,10],[10,10,10]] #Two 10 MW coal plants from 2020-2022
     MAXCAP = [20] #One 20 MW RE plant
-    CF = [[.4,.75,.75]]#Rising CF for R1
+    CF = [[.5,.5,.5]]#Constant CF for R1
     CAPEX = [1] #R1 CAPEX costs
     REOPEX = [1] #R1 OPEX costs
-    COALOPEX = [5,6] #Coal 1 cheaper than coal 2 (however both are more expensive then R1 and R2)
+    COALOPEX = [5,6] #Coal 1 cheaper than coal 2 (however both are more expensive than R1)
     MAXSITES = [1,2] #1 RE plant available for coal plant 1 and 2 RE plants for coal plant 2
     HD = [10,5] #C1 10 $/MWh while C2 5$/MWh (C1 worse health option then C2)
-    RETEF = [0,0] #Constant retirement EFs (COAL 1 RET EFS =COAL 2 RET EFS)
-    CONEF = [[.1,1,.1]] #R1 construction EF
+    RETEF = [1,1.2] #Would want to retire coal 2
+    CONEF = [[.1,.5,.1]] #R1 construction EF
     COALOMEF = [.5,.5] #Coal plant 1 and coal plant 2 have same O&M ratios
-    REOMEF = [[0,0,0]] #R1 O&M EFs 
+    REOMEF = [[.25,.2,.2]] #R1 O&M EFs
     ######################
 
     m = EquitableRetirement()
