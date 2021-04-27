@@ -38,6 +38,7 @@ Python implementation of the "TITLE" (multi-objective pathways to *more* equitab
 12. **Three weight test:**
     * System cost + health + jobs weight: Run 13 **(done)**
 
+* **Note**: Excel datasets of final variables for each run are in the Test Run folder w/ breakdowns of each variable.
 
 # Test Run (1-5) Dataset
 
